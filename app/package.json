@@ -1,17 +1,18 @@
 {
-  "name": "webpack-i18n-loader",
+  "name": "app",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/index.js",
+  "main": "webpack.config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:app": "cd app/dist && npx anywhere",
-    "build:loader": "rm -rf lib && tsc -p ./src/tsconfig.json --watch",
-    "build:app": "cd app && webpack"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "@babel/preset-react": "^7.16.7",
+    "@babel/preset-typescript": "^7.16.7",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "typescript": "^4.6.2"
+  },
   "devDependencies": {
     "@types/react": "^17.0.41",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
@@ -28,14 +29,7 @@
     "webpack": "^5.70.0",
     "webpack-cli": "^4.9.2"
   },
-  "dependencies": {
-    "@babel/parser": "7.17.8",
-    "@babel/traverse": "7.15.4",
-    "@babel/generator": "7.16.0",
-    "@babel/types": "7.17.0",
-    "typescript": "^4.6.2"
-  },
-  "engines": {
-    "node": ">=12.0.0"
-  }
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
