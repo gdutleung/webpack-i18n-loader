@@ -13,6 +13,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/template": "^7.16.7",
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__template": "^7.4.1",
+    "@types/babel__traverse": "^7.14.2",
     "@types/react": "^17.0.41",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
@@ -29,9 +33,9 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
+    "@babel/generator": "7.16.0",
     "@babel/parser": "7.17.8",
     "@babel/traverse": "7.15.4",
-    "@babel/generator": "7.16.0",
     "@babel/types": "7.17.0",
     "typescript": "^4.6.2"
   },

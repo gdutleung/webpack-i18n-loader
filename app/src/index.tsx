@@ -1,4 +1,5 @@
 import React from 'react'
+import * as _t from '@babel/core';
 
 // import App from './pages/App'
 import ReactDOM from 'react-dom'

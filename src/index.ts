@@ -8,9 +8,9 @@ function i18nLoader (this: LoaderContext<void>, content: string) {
     i18nPackage: '@byted/xx'
   })
 
-  const result = devCompiler.startCompile()
+  const { code, map } = devCompiler.startCompile() || {}
 
-  this.callback(null, result?.code || content)
+  this.callback(null, code || content)
 }
 
 export default i18nLoader

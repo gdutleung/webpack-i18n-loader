@@ -1,8 +1,9 @@
 import * as Parser from '@babel/parser'
-import traverse, { TraverseOptions } from '@babel/traverse'
+import traverse from '@babel/traverse'
 import generator, { GeneratorResult } from '@babel/generator'
 import * as t from '@babel/types'
 import { DEFAULT_I18N_CONFIG, DEFAULT_PARSER_OPTIONS } from '../constant'
+import template from '@babel/template'
 
 export interface DevCompilerOptions {
   i18nFn?: string;
@@ -12,19 +13,17 @@ export interface DevCompilerOptions {
 }
 
 class DevCompiler {
-  private sourceCode: string
-
   i18nFn: string
-
+  
   i18nPackage: string
+  
+  private sourceCode: string
 
   private ast?: ReturnType<typeof Parser['parse']>
 
   private parserOptions: Parser.ParserOptions
 
   private result: GeneratorResult | null = null
-
-  private isImported: boolean = false
 
   constructor (options: DevCompilerOptions) {
     const { sourceCode, i18nFn, i18nPackage, parserOptions } = options
@@ -43,34 +42,41 @@ class DevCompiler {
   private traverseNode(ast = this.ast) {
     const self = this
 
-    const visitor: TraverseOptions<t.Node> = {
-      ImportDeclaration(path) {
-        const sourcePackage = path.node.source.value
+    traverse(ast, {
+      Program(path, state) {
+        let imported = false
 
-        if (sourcePackage === self.i18nPackage) {
-          self.isImported = true
+        path.traverse({
+          ImportDeclaration(path) {
+            const packageName = path.node.source.value
+
+            if (packageName === self.i18nPackage) {
+              imported = true
+            }
+          }
+        })
+
+        if (!imported) {
+          const uid = path.scope.generateUid(self.i18nFn)
+          const importStatement = `import { ${self.i18nFn} as ${uid}} from "${self.i18nPackage}"`
+          const importAST = template.ast(importStatement)
+
+          path.node.body.unshift(importAST as t.Statement)
         }
       }
+    })
 
-    }
-    traverse(ast, visitor)
-
-    // if (!self.isImported) {
-    //   ast.
-    // }
   }
 
   private generateCode(ast = this.ast) {
     if (ast) {
-      return generator(ast)
+      this.result = generator(ast)
     }
   }
 
   startCompile () {
     this.parseCode()
-
     this.traverseNode()
-
     this.generateCode()
 
     return this.result
