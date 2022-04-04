@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import * as _t from '@babel/core'
 // import { useTranslate } from '@common/hooks/useTranslate'
-import { useTranslate as _useTranslate } from '@common/hooks/useTranslate'
+import { useTranslate } from '@common/hooks/useTranslate'
 
 // import App from './pages/App'
 import ReactDOM from 'react-dom'
@@ -21,7 +21,7 @@ const App = () => {
     )
   }, [])
 
-  // const { t } = useTranslate()
+  const { t: _t2 } = useTranslate()
 
   return (
     <div>

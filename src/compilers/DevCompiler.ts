@@ -46,8 +46,9 @@ class DevCompiler {
 
   traverseNode(ast = this.ast) {
     const self = this
+    let customHookName = ''
     let localSpecifierName = ''
-    let insertImportStatement = () => {}
+    let insertImportStatement = () => { }
 
     // resolve Import Declaration
     traverse(ast, {
@@ -55,12 +56,12 @@ class DevCompiler {
         const packageName = path.node.source.value
 
         if (packageName === self.i18nPackage) {
-          localSpecifierName = path.node.specifiers[0].local.name
+          customHookName = path.node.specifiers[0].local.name
         }
         insertImportStatement = () => {
-          if (!localSpecifierName) {
-            localSpecifierName = path.scope.generateUid(self.i18nFn)
-            const importStatement = `import { ${self.i18nFn} as ${localSpecifierName}} from "${self.i18nPackage}"`
+          if (!customHookName) {
+            customHookName = path.scope.generateUid(self.i18nFn)
+            const importStatement = `import { ${self.i18nFn} as ${customHookName}} from "${self.i18nPackage}"`
             const importAST = template.ast(importStatement)
 
             if (t.isProgram(path.parent) && t.isStatement(importAST)) {
@@ -91,7 +92,7 @@ class DevCompiler {
             ancestorPath.isFunctionExpression()
           ) {
             if (t.isBlockStatement(ancestorPath.node.body)) {
-              // have `const { t } = useTranslate()`
+              // already declared `const { t } = useTranslate()`
               ancestorPath.node.body.body.forEach((node) => {
                 if (t.isVariableDeclaration(node)) {
                   node.declarations.forEach((d) => {
@@ -101,16 +102,35 @@ class DevCompiler {
                       t.isIdentifier(d.init.callee)
                     ) {
                       const calleeName = d.init.callee.name
-                      if (calleeName === self.i18nFn) {
+                      if (calleeName === customHookName) {
                         isUseTranslateCalled = true
+
+                        if (t.isObjectPattern(d.id)) {
+                          const declaredNode = d.id.properties[0]
+                          if (t.isObjectProperty(declaredNode) && t.isIdentifier(declaredNode.value)) {
+                            localSpecifierName = declaredNode.value.name
+                          }
+                        }
                       }
                     }
                   })
                 }
               })
+
+              // auto insert `const { t } = useTranslate()`
+              if (!isUseTranslateCalled) {
+                localSpecifierName = path.scope.generateUid('t')
+                const ast = template.ast(`const { t: ${localSpecifierName} } = ${customHookName}()`)
+                if (t.isStatement(ast)) {
+                  ancestorPath.node.body.body.unshift(ast)
+                }
+              }
             }
           }
 
+
+
+          // ((i18n_key)) -> t("i18n_key")
           const key = text
             .replace(/\s/g, '')
             .replace(/\(/g, '')
@@ -123,6 +143,8 @@ class DevCompiler {
 
           path.replaceWith(replaceExpressionWithContainer)
           path.skip()
+
+
         }
       }
     })

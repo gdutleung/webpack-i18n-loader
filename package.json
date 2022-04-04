@@ -4,9 +4,8 @@
   "description": "",
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev:app": "cd app/dist && npx anywhere",
-    "build:loader": "rm -rf lib && tsc -p ./src/tsconfig.json --watch",
+    "dev:loader": "rm -rf lib && tsc -p ./src/tsconfig.json --watch",
     "build:app": "cd app && webpack"
   },
   "keywords": [],
